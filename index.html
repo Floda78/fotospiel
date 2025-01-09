@@ -274,6 +274,20 @@
   }
 </script>
 
+// Speicher den verbleibenden Aufgabenbestand in Firebase
+function saveRemainingTasks() {
+  firebase.database().ref("tasksRemaining").set(tasks.length);
+}
+
+// Daten aus Firebase abrufen
+firebase.database().ref("tasksRemaining").on("value", (snapshot) => {
+  const remaining = snapshot.val();
+  if (remaining !== null) {
+    tasks = originalTasks.slice(0, remaining);
+    counterDisplay.textContent = tasks.length;
+  }
+});
+
         ];
 
 const dbRef = firebase.database().ref('tasks');
@@ -287,12 +301,6 @@ dbRef.once('value').then(snapshot => {
     });
   }
 });
-
-function generateTask() {
-  dbRef.once('value').then(snapshot => {
-    const data = snapshot.val();
-    const tasks = data.tasks || [];
-    const lastResetTime = data.lastResetTime;
 
     const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
     const currentTime = Date.now();
