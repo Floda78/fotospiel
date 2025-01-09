@@ -258,55 +258,54 @@
         ];
 
 <script>
-    const dbRef = firebase.database().ref('tasks');
+const dbRef = firebase.database().ref('tasks');
 
-    // Initialisiere Aufgaben, wenn die Datenbank leer ist
-    dbRef.once('value').then(snapshot => {
-        if (!snapshot.exists()) {
-            dbRef.set({
-                tasks: originalTasks,
-                lastResetTime: Date.now()
-            });
-        }
+// Initialisiere Aufgaben, wenn die Datenbank leer ist
+dbRef.once('value').then(snapshot => {
+  if (!snapshot.exists()) {
+    dbRef.set({
+      tasks: originalTasks,
+      lastResetTime: Date.now()
     });
+  }
+});
 
-    function generateTask() {
-        dbRef.once('value').then(snapshot => {
-            const data = snapshot.val();
-            const tasks = data.tasks || [];
-            const lastResetTime = data.lastResetTime;
+function generateTask() {
+  dbRef.once('value').then(snapshot => {
+    const data = snapshot.val();
+    const tasks = data.tasks || [];
+    const lastResetTime = data.lastResetTime;
 
-            // Überprüfen, ob 12 Stunden vergangen sind
-            const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
-            const currentTime = Date.now();
-            if (currentTime - lastResetTime >= twelveHoursInMilliseconds) {
-                dbRef.set({
-                    tasks: originalTasks,
-                    lastResetTime: currentTime
-                });
-                alert('Aufgaben wurden zurückgesetzt!');
-                return;
-            }
+    const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
+    const currentTime = Date.now();
 
-            if (tasks.length === 0) {
-                document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
-                return;
-            }
-
-            // Zufällige Aufgabe auswählen
-            const randomIndex = Math.floor(Math.random() * tasks.length);
-            const selectedTask = tasks.splice(randomIndex, 1)[0];
-
-            // Datenbank aktualisieren
-            dbRef.update({ tasks });
-
-            // Aufgabe anzeigen
-            document.getElementById("taskDisplay").innerText = selectedTask;
-            document.getElementById("tasksRemaining").innerText = tasks.length;
-        }).catch(error => {
-            console.error("Fehler beim Abrufen der Daten:", error);
-        });
+    // Aufgaben zurücksetzen, wenn 12 Stunden vergangen sind
+    if (currentTime - lastResetTime >= twelveHoursInMilliseconds) {
+      dbRef.set({
+        tasks: originalTasks,
+        lastResetTime: currentTime
+      });
+      alert('Aufgaben wurden zurückgesetzt!');
+      return;
     }
+
+    if (tasks.length === 0) {
+      document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
+      return;
+    }
+
+    // Zufällige Aufgabe auswählen
+    const randomIndex = Math.floor(Math.random() * tasks.length);
+    const selectedTask = tasks.splice(randomIndex, 1)[0];
+
+    // Aktualisiere die Datenbank
+    dbRef.update({ tasks });
+
+    // Aufgabe anzeigen
+    document.getElementById("taskDisplay").innerText = selectedTask;
+    document.getElementById("tasksRemaining").innerText = tasks.length;
+  });
+}
 </script>
 </body>
 </html>
