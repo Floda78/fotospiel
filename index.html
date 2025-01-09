@@ -151,9 +151,8 @@
   const app = firebase.initializeApp(firebaseConfig);
   const db = firebase.database(app);
     
-</script>
-
-        const originalTasks = [
+    <script>
+  const originalTasks = [
             "Mache ein Porträtfoto vom Geburtstagskind",
             "Male das Geburtstagskind auf die Serviette und fotografiere die Zeichnung.",
             "Fotografiere das Geburtstagskind von möglichst weit oben",
@@ -256,6 +255,25 @@
             "Mache ein Foto von dir und dem Geburtstagskind, während ihr beide in eine Pose springt.",
             "Fordere jemanden zu einem Tanz-Wettbewerb heraus und mache ein Bild davon.",
             "Mache ein Foto von einer kreativen Art, wie jemand eine Serviette faltet.",
+  ];
+
+  let tasks = [...originalTasks]; // Kopie der ursprünglichen Aufgaben
+  const taskDisplay = document.getElementById("taskDisplay");
+  const counterDisplay = document.getElementById("tasksRemaining");
+
+  // Aufgabe generieren
+  function generateTask() {
+    if (tasks.length === 0) {
+      taskDisplay.textContent = "Alle Aufgaben sind vergeben! Viel Spaß!";
+      return;
+    }
+    const randomIndex = Math.floor(Math.random() * tasks.length);
+    const selectedTask = tasks.splice(randomIndex, 1)[0];
+    taskDisplay.textContent = selectedTask;
+    counterDisplay.textContent = tasks.length;
+  }
+</script>
+
         ];
 
 const dbRef = firebase.database().ref('tasks');
