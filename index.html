@@ -270,28 +270,27 @@
             }
         });
 
-        function generateTask() {
-            dbRef.once('value').then(snapshot => {
-                const data = snapshot.val();
-                const tasks = data.tasks || [];
-                const lastResetTime = data.lastResetTime;
+         function generateTask() {
+            if (tasks.length === 0) {
+                document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
+                return;
+            }
 
-                const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
-                const currentTime = Date.now();
+            const button = document.querySelector('.generate-button');
+            button.disabled = true;
 
-                // Aufgaben zurücksetzen, wenn 12 Stunden vergangen sind
-                if (currentTime - lastResetTime >= twelveHoursInMilliseconds) {
-                    dbRef.set({
-                        tasks: originalTasks,
-                        lastResetTime: currentTime
-                    });
-                    alert('Aufgaben wurden zurückgesetzt!');
-                    return;
-                }
+            const animations = ["fade", "zoom", "rotate"];
+            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
 
-                if (tasks.length === 0) {
-                    document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
-                    return;
+            const taskDisplayElement = document.getElementById("taskDisplay");
+            taskDisplayElement.className = "task-display " + randomAnimation;
+
+            const animationsText = ["Wird geladen...", "Zufällige Aufgabe wird gesucht...", "Gleich hast du deine Aufgabe..."];
+            let i = 0;
+            const interval = setInterval(() => {
+                taskDisplayElement.innerText = animationsText[i % animationsText.length];
+                i++;
+            }, 500);
                 }
 
                 // Zufällige Aufgabe auswählen
