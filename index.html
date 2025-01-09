@@ -73,6 +73,45 @@
             margin-top: 20px;
         }
 
+        .fade {
+            animation: fadeIn 3s forwards;
+        }
+
+        .zoom {
+            animation: zoomIn 3s forwards;
+        }
+
+        .rotate {
+            animation: rotateIn 3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateIn {
+            from {
+                transform: rotate(-360deg);
+            }
+            to {
+                transform: rotate(0);
+            }
+        }
+
         .counter {
             font-size: 0.9rem;
             margin-top: 10px;
