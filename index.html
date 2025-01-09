@@ -71,47 +71,6 @@
             font-size: 1.2rem;
             font-weight: bold;
             margin-top: 20px;
-            opacity: 1;
-            transition: opacity 3s ease-in-out;
-        }
-
-        .fade {
-            animation: fadeIn 3s forwards;
-        }
-
-        .zoom {
-            animation: zoomIn 3s forwards;
-        }
-
-        .rotate {
-            animation: rotateIn 3s forwards;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes zoomIn {
-            from {
-                transform: scale(0);
-            }
-            to {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes rotateIn {
-            from {
-                transform: rotate(-360deg);
-            }
-            to {
-                transform: rotate(0);
-            }
         }
 
         .counter {
@@ -133,8 +92,28 @@
         <button class="generate-button" onclick="generateTask()">Aufgabe generieren</button>
         <div class="task-display" id="taskDisplay">&nbsp;</div>
         <div class="counter" id="counterDisplay">Noch <span id="tasksRemaining">102</span> Aufgaben übrig</div>
-    </div> 
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
+
     <script>
+        // Firebase-Konfiguration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database(app);
+
         const originalTasks = [
             "Mache ein Porträtfoto vom Geburtstagskind",
             "Male das Geburtstagskind auf die Serviette und fotografiere die Zeichnung.",
@@ -240,49 +219,53 @@
             "Mache ein Foto von einer kreativen Art, wie jemand eine Serviette faltet.",
         ];
 
-        let tasks = JSON.parse(localStorage.getItem("tasks")) || [...originalTasks];
+        const dbRef = firebase.database().ref('tasks');
 
-        const lastResetTime = localStorage.getItem("lastResetTime");
-        const currentTime = new Date().getTime();
-        const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
-
-        if (!lastResetTime || currentTime - lastResetTime >= twelveHoursInMilliseconds) {
-            tasks = [...originalTasks];
-            localStorage.setItem("lastResetTime", currentTime);
-            localStorage.setItem("tasks", JSON.stringify(tasks));
-        }
+        // Initialisiere Aufgaben, wenn die Datenbank leer ist
+        dbRef.once('value').then(snapshot => {
+            if (!snapshot.exists()) {
+                dbRef.set({
+                    tasks: originalTasks,
+                    lastResetTime: Date.now()
+                });
+            }
+        });
 
         function generateTask() {
-            if (tasks.length === 0) {
-                document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
-                return;
-            }
+            dbRef.once('value').then(snapshot => {
+                const data = snapshot.val();
+                const tasks = data.tasks || [];
+                const lastResetTime = data.lastResetTime;
 
-            const button = document.querySelector('.generate-button');
-            button.disabled = true;
+                const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
+                const currentTime = Date.now();
 
-            const animations = ["fade", "zoom", "rotate"];
-            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+                // Aufgaben zurücksetzen, wenn 12 Stunden vergangen sind
+                if (currentTime - lastResetTime >= twelveHoursInMilliseconds) {
+                    dbRef.set({
+                        tasks: originalTasks,
+                        lastResetTime: currentTime
+                    });
+                    alert('Aufgaben wurden zurückgesetzt!');
+                    return;
+                }
 
-            const taskDisplayElement = document.getElementById("taskDisplay");
-            taskDisplayElement.className = "task-display " + randomAnimation;
+                if (tasks.length === 0) {
+                    document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
+                    return;
+                }
 
-            const animationsText = ["Wird geladen...", "Zufällige Aufgabe wird gesucht...", "Gleich hast du deine Aufgabe..."];
-            let i = 0;
-            const interval = setInterval(() => {
-                taskDisplayElement.innerText = animationsText[i % animationsText.length];
-                i++;
-            }, 500);
-
-            setTimeout(() => {
-                clearInterval(interval);
+                // Zufällige Aufgabe auswählen
                 const randomIndex = Math.floor(Math.random() * tasks.length);
                 const selectedTask = tasks.splice(randomIndex, 1)[0];
-                taskDisplayElement.innerText = selectedTask;
+
+                // Aktualisiere die Datenbank
+                dbRef.update({ tasks });
+
+                // Aufgabe anzeigen
+                document.getElementById("taskDisplay").innerText = selectedTask;
                 document.getElementById("tasksRemaining").innerText = tasks.length;
-                localStorage.setItem("tasks", JSON.stringify(tasks));
-                button.disabled = false;
-            }, 3000);
+            });
         }
     </script>
 </body>
