@@ -258,53 +258,56 @@
             "Mache ein Foto von einer kreativen Art, wie jemand eine Serviette faltet.",
         ];
 
-        const dbRef = firebase.database().ref('tasks');
+<script>
+    const dbRef = firebase.database().ref('tasks');
 
-        // Initialisiere Aufgaben, wenn die Datenbank leer ist
+    // Initialisiere Aufgaben, wenn die Datenbank leer ist
+    dbRef.once('value').then(snapshot => {
+        if (!snapshot.exists()) {
+            dbRef.set({
+                tasks: originalTasks,
+                lastResetTime: Date.now()
+            });
+        }
+    });
+
+    function generateTask() {
         dbRef.once('value').then(snapshot => {
-            if (!snapshot.exists()) {
+            const data = snapshot.val();
+            const tasks = data.tasks || [];
+            const lastResetTime = data.lastResetTime;
+
+            // Überprüfen, ob 12 Stunden vergangen sind
+            const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
+            const currentTime = Date.now();
+            if (currentTime - lastResetTime >= twelveHoursInMilliseconds) {
                 dbRef.set({
                     tasks: originalTasks,
-                    lastResetTime: Date.now()
+                    lastResetTime: currentTime
                 });
+                alert('Aufgaben wurden zurückgesetzt!');
+                return;
             }
-        });
 
-         function generateTask() {
             if (tasks.length === 0) {
                 document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
                 return;
             }
 
-            const button = document.querySelector('.generate-button');
-            button.disabled = true;
+            // Zufällige Aufgabe auswählen
+            const randomIndex = Math.floor(Math.random() * tasks.length);
+            const selectedTask = tasks.splice(randomIndex, 1)[0];
 
-            const animations = ["fade", "zoom", "rotate"];
-            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+            // Datenbank aktualisieren
+            dbRef.update({ tasks });
 
-            const taskDisplayElement = document.getElementById("taskDisplay");
-            taskDisplayElement.className = "task-display " + randomAnimation;
-
-            const animationsText = ["Wird geladen...", "Zufällige Aufgabe wird gesucht...", "Gleich hast du deine Aufgabe..."];
-            let i = 0;
-            const interval = setInterval(() => {
-                taskDisplayElement.innerText = animationsText[i % animationsText.length];
-                i++;
-            }, 500);
-                }
-
-                // Zufällige Aufgabe auswählen
-                const randomIndex = Math.floor(Math.random() * tasks.length);
-                const selectedTask = tasks.splice(randomIndex, 1)[0];
-
-                // Aktualisiere die Datenbank
-                dbRef.update({ tasks });
-
-                // Aufgabe anzeigen
-                document.getElementById("taskDisplay").innerText = selectedTask;
-                document.getElementById("tasksRemaining").innerText = tasks.length;
-            });
-        }
-    </script>
+            // Aufgabe anzeigen
+            document.getElementById("taskDisplay").innerText = selectedTask;
+            document.getElementById("tasksRemaining").innerText = tasks.length;
+        }).catch(error => {
+            console.error("Fehler beim Abrufen der Daten:", error);
+        });
+    }
+</script>
 </body>
 </html>
