@@ -78,6 +78,37 @@
             margin-top: 10px;
             font-style: italic;
         }
+        
+        .animation {
+            animation-duration: 3s;
+        }
+
+        .fade-in {
+            animation-name: fadeIn;
+        }
+
+        .slide-in {
+            animation-name: slideIn;
+        }
+
+        .zoom-in {
+            animation-name: zoomIn;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -128,11 +159,32 @@
 
         // Aufgabe generieren
         async function generateTask() {
-            try {
-                if (tasks.length === 0) {
-                    taskDisplay.textContent = "Alle Aufgaben sind bereits vergeben!";
-                    return;
-                }
+            if (tasks.length === 0) {
+                document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
+                return;
+            }
+
+            const button = document.querySelector('.generate-button');
+            button.disabled = true;
+
+            // Animation simulieren
+            const animations = ["Wird geladen...", "Zufällige Aufgabe wird gesucht...", "Gleich hast du deine Aufgabe..."];
+            let i = 0;
+            const interval = setInterval(() => {
+                document.getElementById("taskDisplay").innerText = animations[i % animations.length];
+                i++;
+            }, 500);
+
+            // Nach 3 Sekunden Aufgabe anzeigen
+            setTimeout(() => {
+                clearInterval(interval);
+                const randomIndex = Math.floor(Math.random() * tasks.length);
+                const selectedTask = tasks.splice(randomIndex, 1)[0];
+                document.getElementById("taskDisplay").innerText = selectedTask;
+                document.getElementById("tasksRemaining").innerText = tasks.length;
+                button.disabled = false;
+            }, 3000);
+            }
 
                 // Aufgabe aus Firebase abrufen
                 const snapshot = await database.ref("generatedTasks").once("value");
