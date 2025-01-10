@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fotospiel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='50'>📸</text></svg>">
+    <meta name="description" content="Ein lustiges Fotospiel mit zufälligen Aufgaben für deine Party!">
+    <meta name="author" content="Dein Name">
     <style>
         body {
             background-color: #274472;
@@ -68,43 +71,53 @@
             font-size: 1.2rem;
             font-weight: bold;
             margin-top: 20px;
+            opacity: 1;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .fade {
+            animation: fadeIn 3s forwards;
+        }
+
+        .zoom {
+            animation: zoomIn 3s forwards;
+        }
+
+        .rotate {
+            animation: rotateIn 3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateIn {
+            from {
+                transform: rotate(-360deg);
+            }
+            to {
+                transform: rotate(0);
+            }
         }
 
         .counter {
             font-size: 0.9rem;
             margin-top: 10px;
             font-style: italic;
-        }
-
-        .animation {
-            animation-duration: 3s;
-        }
-
-        .fade-in {
-            animation-name: fadeIn;
-        }
-
-        .slide-in {
-            animation-name: slideIn;
-        }
-
-        .zoom-in {
-            animation-name: zoomIn;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-
-        @keyframes zoomIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
         }
     </style>
 </head>
@@ -123,7 +136,7 @@
     </div>
 
     <script>
-        const tasks = [
+        const originalTasks = [
             "Mache ein Porträtfoto vom Geburtstagskind",
             "Male das Geburtstagskind auf die Serviette und fotografiere die Zeichnung.",
             "Fotografiere das Geburtstagskind von möglichst weit oben",
@@ -228,6 +241,18 @@
             "Mache ein Foto von einer kreativen Art, wie jemand eine Serviette faltet.",
         ];
 
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [...originalTasks];
+
+        const lastResetTime = localStorage.getItem("lastResetTime");
+        const currentTime = new Date().getTime();
+        const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
+
+        if (!lastResetTime || currentTime - lastResetTime >= twelveHoursInMilliseconds) {
+            tasks = [...originalTasks];
+            localStorage.setItem("lastResetTime", currentTime);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
         function generateTask() {
             if (tasks.length === 0) {
                 document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
@@ -237,21 +262,26 @@
             const button = document.querySelector('.generate-button');
             button.disabled = true;
 
-            // Animation simulieren
-            const animations = ["Wird geladen...", "Zufällige Aufgabe wird gesucht...", "Gleich hast du deine Aufgabe..."];
+            const animations = ["fade", "zoom", "rotate"];
+            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+
+            const taskDisplayElement = document.getElementById("taskDisplay");
+            taskDisplayElement.className = "task-display " + randomAnimation;
+
+            const animationsText = ["Wird geladen...", "Zufällige Aufgabe wird gesucht...", "Gleich hast du deine Aufgabe..."];
             let i = 0;
             const interval = setInterval(() => {
-                document.getElementById("taskDisplay").innerText = animations[i % animations.length];
+                taskDisplayElement.innerText = animationsText[i % animationsText.length];
                 i++;
             }, 500);
 
-            // Nach 3 Sekunden Aufgabe anzeigen
             setTimeout(() => {
                 clearInterval(interval);
                 const randomIndex = Math.floor(Math.random() * tasks.length);
                 const selectedTask = tasks.splice(randomIndex, 1)[0];
-                document.getElementById("taskDisplay").innerText = selectedTask;
+                taskDisplayElement.innerText = selectedTask;
                 document.getElementById("tasksRemaining").innerText = tasks.length;
+                localStorage.setItem("tasks", JSON.stringify(tasks));
                 button.disabled = false;
             }, 3000);
         }
