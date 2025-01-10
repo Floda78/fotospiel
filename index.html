@@ -123,39 +123,113 @@
         <button class="generate-button" onclick="generateTask()">Aufgabe generieren</button>
         <div class="task-display" id="taskDisplay">&nbsp;</div>
         <div class="counter" id="counterDisplay">Noch <span id="tasksRemaining">102</span> Aufgaben übrig</div>
-    </div>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js"></script>
-
-    <!-- Firebase-Konfiguration -->
+    </div
+        
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDA4sSdzx_MYaivp3vCg63201_oOghkKVA",
-            authDomain: "fotospiel-86285.firebaseapp.com",
-            databaseURL: "https://fotospiel-86285-default-rtdb.firebaseio.com",
-            projectId: "fotospiel-86285",
-            storageBucket: "fotospiel-86285.firebasestorage.app",
-            messagingSenderId: "274758787072",
-            appId: "1:274758787072:web:18a7b89fe3a3948a0f78e5"
-        };
-
-        // Firebase initialisieren
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        const originalTasks = [
+        const tasks = [
             "Mache ein Porträtfoto vom Geburtstagskind",
             "Male das Geburtstagskind auf die Serviette und fotografiere die Zeichnung.",
             "Fotografiere das Geburtstagskind von möglichst weit oben",
             "Fotografiere das Outfit des Geburtstagskinds",
-            // Weitere Aufgaben ...
+            "Bringe das Geburtstagskind zum Lachen und fotografiere es",
+            "Mache dem Geburtstagskind ein Kompliment und fotografiere seine Reaktion",
+            "Schneide zusammen mit dem Geburtstagskind eine Grimasse und fotografiert euch dabei.",
+            "Stoße mit dem Geburtstagskind an und lass es fotografieren.",
+            "Mach eine Nahaufnahme von den Augen vom Geburtstagskind",
+            "Suche zwei Gäste aus und bitte sie dem Geburtstagskind rechts und links auf die Wange gleichzeitig ein Küsschen zu geben und fotografiere es.",
+            "Fotografiere das Geburtstagskind auf der Froschperspektive nach oben.",
+            "Mache eine schöne Aufnahme über die Schulter des Geburtstagskinds mit der Feier im Hintergrund.",
+            "Mache ein Foto vom schönsten Paar",
+            "Suche 5 unterschiedlich große Gäste und sortiere sie der Größe nach und mache ein Foto davon.",
+            "Bitte einen weiblichen Gast und einen männlichen Gast mit ihren Händen ein Herz zu formen und fotografiere es.",
+            "Suche deinen Lieblingsmenschen und mache ein schönes Selfie.",
+            "Mache ein Selfie von dir mit den jüngsten drei Gästen unter dem Tisch.",
+            "Mache ein einziges Foto von allen Familienmitgliedern des Geburtstagskindes.",
+            "Trommel mindestens 10 Gäste zusammen und fotografiere sie beim Anstoßen.",
+            "Lege die Kamera unten in die Mitte, beuge dich mit mindestens 3 anderen Gästen nach vorne, schaut nach unten und lacht",
+            "Mache ein Bild mit mindestens 5 Gästen, die eine Brille tragen und schaut alle sehr intelligent.",
+            "Bitte einen Gast durch die Kamera zu schauen und fotografiere ihn wie er dich fotografiert.",
+            "Suche den Gast mit dem schönsten Kleidungsstück und fotografiere ihn oder sie",
+            "Fotografiere ein Gast, das dir eine Kusshand zuwirft.",
+            "Mache ein Generationen-Foto",
+            "Fotografiere die schönste Frisur",
+            "Mache ein Foto von allen Geschwistern des Geburtstagskinds",
+            "Fotografiere den am besten gekleideten Mann.",
+            "Mach ein Selfie Foto von allen Leuten, die mit dir am Tisch sitzen.",
+            "Lasse einen Gast oder deine:n Partner:in mit den Händen ein Herz formen, durch das du das Geburtstagskind eingerahmt fotografierst.",
+            "Bitte einen Gast dir möglichst durchtrieben zuzublinzeln und fotografiere ihn dabei.",
+            "Fotografiere die schönste Frisur",
+            "Bitte einen Gast die Pose von Angela Merkel einzunehmen und sie nachzuahmen und fotografiert das",
+            "Mache ein Selfie mit dem Essen, das ausdrückt wie lecker du ihn findest.",
+            "Mache ein Foto von dem Mann mit dem längsten Bart.",
+            "Fotografiere einen Gast, der ein Gesicht macht, als würde er gerade im Looping in der Achterbahn fahren.",
+            "Bitte einen Gast das Geburtstagskind zu porträtieren und mache ein Foto davon.",
+            "Bitte den größten Gast, den kleinsten Gast auf die Schultern zu nehmen und fotografiere sie.",
+            "Versuche ein Foto mit so vielen Gästen wie möglich zu machen.",
+            "Fotografiere die Hand des ältesten Hochzeitsgasts",
+            "Finde eine Person, die genauso groß ist wie du und mache mit ihr zusammen ein Foto Rücken an Rücken.",
+            "Trommel alle Frauen zusammen und mache ein Gruppenbild von allen",
+            "Mache ein Bild mit allen Schülern",
+            "Mache ein Foto von allen Mannschaftskollegen des Geburtstagskinds.",
+            "Trommel alle Männer zusammen und mache ein Gruppenbild von allen",
+            "Finde 3 Gäste, die zusammen genau 100 Jahre sind.",
+            "Finde einen Gast mit einem witzigen Personalausweis-Foto und fotografiere es (nur das Bild) und den Besitzer",
+            "Finde den Gast mit der weitesten Anreise und fotografiere ihn aus der Entfernung.",
+            "Mache ein Foto mit allen, die mit dem Geburtstagskind in einer Klasse waren.",
+            "Finde eine Person mit dem gleichen Sternzeichen und mache ein Foto von euch",
+            "Finde den jüngsten und den ältesten Gast und fotografiere sie zusammen!",
+            "Finde die Person, die deinem Alter am nächsten ist und fotografiert euch zusammen!",
+            "Mache ein Foto mit der Person, die die meisten Kinder hat.",
+            "Finde einen Gast mit einem witzigen Führerscheinfoto und mache ein Bild vom Führerschein-Foto und Besitzer.",
+            "Finde eine Person, deren Vorname mit dem gleichen Buchstaben beginnt wie deiner und macht zusammen ein Selfie",
+            "Mache ein Foto mit allen, die ein Haustier haben.",
+            "Mache ein Foto mit allen, die ein Instrument spielen.",
+            "Finde eine Person mit einer Gemeinsamkeit und fotografiert euch zusammen!",
+            "Finde eine Person, die etwas total ungewöhnliches macht und macht gemeinsam ein Foto.",
+            "Finde heraus, welches Paar am längsten zusammen/verheiratet ist und fotografiere es!",
+            "Suche alle Gäste mit der gleichen Schuhfarbe wie deine und mache ein Bild von euren Schuhen.",
+            "Fotografiere das schönste Stück der Deko",
+            "Mach ein Bild von der Geburtstagsgesellschaft in Vogelperspektive – mindestens von einem Stuhl!",
+            "Fotografiere etwas total typisches für den Ort der Geburtstagsfeier drinnen oder draußen.",
+            "Mache ein Foto vom gefüllten Snacktisch.",
+            "Mache ein Vorher-Bild von der Tanzfläche",
+            "Mache ein Selfie vom Eingang der Location",
+            "Mache ein Foto von dir und der Location",
+            "Trommel mindestens 4 Geburtstagsgäste zusammen und lasse sie die Initialien des Geburtstagskindes darstellen und fotografiere es.",
+            "Finde jemanden, der einen Handstand oder ein Rad macht und fotografiere sie dabei",
+            "Fotografiere dich, wie du eine Yoga-Pose machst",
+            "Finde so viele Männer, wie du kannst die einen anderen Gast auf den Arm nehmen und fotografiere die Gruppe.",
+            "Rufe zur Polonaise auf, die du anführst und mache ein Selfie.",
+            "Trommle 3 Männer zusammen, die das Geburtstagskind über ihre Schultern hoch in die Luft heben und schweben lassen",
+            "Wünsche dir ein Lied und motiviere 3 Leute mit dir dazu richtig abzugehen und zusammen ein Selfie zu machen",
+            "Fotografiere den wildesten Tänzer",
+            "Finde jemanden, der dich Huckepack nimmt oder nimm jemanden Huckepack und mache ein Foto davon.",
+            "Suche einen männlichen Gast, der (deine) Absatzschuhe anzieht und in ihnen einen Catwalk hinlegt",
+            "Bringe jemanden dazu, dem Geburtstagskind ein Ständchen zu singen und fotografiere es.",
+            "Knipse dich kurz bevor du mit dem Geburtstags-Essen futtern anfängst vor dem Teller und schau so verfressen wie du kannst.",
+            "Stelle mit anderen Gästen die Evolution des Affen bis zum Menschen dar und lasst euch dabei fotografieren.",
+            "Halte das Glas vor das Gesicht eines Gasts, so dass es ganz verzerrt ist und mache durch den Glasboden ein Foto davon.",
+            "Du hast im Lotto gewonnen – zeig deinen besten Jubel!",
+            "Finde eine Person, die du nicht kennst und fotografiert euch gemeinsam beim schneiden der gleichen Grimasse.",
+            "Mach eine Nahaufnahme von einem köstlichen Bissen Nachtisch, kurz bevor er im Mund eines Gastes verschwindet.",
+            "Mach ein Foto von dir mit der Tischdeko als Kopfbedeckung.",
+            "Stelle alleine oder mit anderen Gästen eine Szene aus einem Film nach und lasst euch fotografieren",
+            "Suche möglichst viele Gäste, die ihre Zunge gleichzeitig für ein Foto herausstrecken.",
+            "Suche einen Gast mit witzigen Socken und mache ein Bild von den Socken.",
+            "Mache einen Karatekick und fotografiere es.",
+            "Nimm dir ein Requisit von der Deko und mach damit ein albernes Bild.",
+            "Stelle mit 3 weiteren Gästen die 4 Elemente pantomimisch dar und lasst euch fotografieren",
+            "Bringe mehrere Gäste dazu gleichzeitig hochzuspringen und fotografiere den Moment",
+            "Mach ein Bild von 7 Gästen, die ihre Hände im Schoß verschränken wie bei der Mauer beim Fußball und fotografiere sie ohne Köpfe.",
+            "Mach ein Bild von 7 Gästen, die ihre Hände im Schoß verschränken wie bei der Mauer beim Fußball und fotografiere nur die Köpfe.",
+            "Fordere einen Gast heraus, eine schwierige körperliche Herausforderung zu meistern, z. B. einen „Kopfstand“ oder „eine perfekte Plank-Position“ für mindestens 10 Sekunden zu halten und fotografiere dies",
+            "Fordere jemanden zu einem Rennen heraus und mache ein Foto von der Startlinie.",
+            "Mache ein Foto von dir und einem Gast in der Luft, während ihr beide einen High-Five macht.",
+            "Bitte jemanden, einen Handstand zu machen, und fotografiere den Moment.",
+            "Mache ein Foto von dir und dem Geburtstagskind, während ihr beide in eine Pose springt.",
+            "Fordere jemanden zu einem Tanz-Wettbewerb heraus und mache ein Bild davon.",
+            "Mache ein Foto von einer kreativen Art, wie jemand eine Serviette faltet.",
         ];
-
-        let tasks = [...originalTasks];
-        const taskDisplay = document.getElementById("taskDisplay");
-        const counterDisplay = document.getElementById("tasksRemaining");
 
         // Aufgabe generieren
         async function generateTask() {
@@ -184,50 +258,6 @@
                 document.getElementById("tasksRemaining").innerText = tasks.length;
                 button.disabled = false;
             }, 3000);
-            }
-
-                // Aufgabe aus Firebase abrufen
-                const snapshot = await database.ref("generatedTasks").once("value");
-                const generatedTasks = snapshot.val() || {};
-
-                // Noch verfügbare Aufgaben filtern
-                const availableTasks = tasks.filter(task => !generatedTasks[task]);
-
-                if (availableTasks.length === 0) {
-                    taskDisplay.textContent = "Alle Aufgaben sind bereits vergeben!";
-                    return;
-                }
-
-                const randomIndex = Math.floor(Math.random() * availableTasks.length);
-                const selectedTask = availableTasks[randomIndex];
-
-                // Aufgabe anzeigen
-                taskDisplay.textContent = selectedTask;
-
-                // Aufgabe als generiert speichern
-                const updates = {};
-                updates[selectedTask] = true;
-                await database.ref("generatedTasks").update(updates);
-
-                // Aufgabenliste aktualisieren
-                tasks = tasks.filter(task => task !== selectedTask);
-                counterDisplay.textContent = tasks.length;
-            } catch (error) {
-                console.error("Fehler beim Generieren der Aufgabe:", error);
-                taskDisplay.textContent = "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.";
-            }
-        }
-
-        // Verfügbare Aufgaben aus Firebase abrufen
-        database.ref("generatedTasks").on("value", (snapshot) => {
-            try {
-                const generatedTasks = snapshot.val() || {};
-                tasks = originalTasks.filter(task => !generatedTasks[task]);
-                counterDisplay.textContent = tasks.length;
-            } catch (error) {
-                console.error("Fehler beim Abrufen der Aufgaben:", error);
-            }
-        });
-    </script>
+   
 </body>
 </html>
