@@ -128,42 +128,53 @@
 
         // Aufgabe generieren
         async function generateTask() {
-            if (tasks.length === 0) {
-                taskDisplay.textContent = "Alle Aufgaben sind bereits vergeben!";
-                return;
+            try {
+                if (tasks.length === 0) {
+                    taskDisplay.textContent = "Alle Aufgaben sind bereits vergeben!";
+                    return;
+                }
+
+                // Aufgabe aus Firebase abrufen
+                const snapshot = await database.ref("generatedTasks").once("value");
+                const generatedTasks = snapshot.val() || {};
+
+                // Noch verfügbare Aufgaben filtern
+                const availableTasks = tasks.filter(task => !generatedTasks[task]);
+
+                if (availableTasks.length === 0) {
+                    taskDisplay.textContent = "Alle Aufgaben sind bereits vergeben!";
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * availableTasks.length);
+                const selectedTask = availableTasks[randomIndex];
+
+                // Aufgabe anzeigen
+                taskDisplay.textContent = selectedTask;
+
+                // Aufgabe als generiert speichern
+                const updates = {};
+                updates[selectedTask] = true;
+                await database.ref("generatedTasks").update(updates);
+
+                // Aufgabenliste aktualisieren
+                tasks = tasks.filter(task => task !== selectedTask);
+                counterDisplay.textContent = tasks.length;
+            } catch (error) {
+                console.error("Fehler beim Generieren der Aufgabe:", error);
+                taskDisplay.textContent = "Ein Fehler ist aufgetreten. Bitte versuche es später erneut.";
             }
-
-            // Aufgabe aus Firebase abrufen
-            const snapshot = await database.ref("generatedTasks").once("value");
-            const generatedTasks = snapshot.val() || {};
-
-            // Noch verfügbare Aufgaben filtern
-            const availableTasks = tasks.filter(task => !generatedTasks[task]);
-
-            if (availableTasks.length === 0) {
-                taskDisplay.textContent = "Alle Aufgaben sind bereits vergeben!";
-                return;
-            }
-
-            const randomIndex = Math.floor(Math.random() * availableTasks.length);
-            const selectedTask = availableTasks[randomIndex];
-
-            // Aufgabe anzeigen
-            taskDisplay.textContent = selectedTask;
-
-            // Aufgabe als generiert speichern
-            await database.ref("generatedTasks/" + selectedTask).set(true);
-
-            // Aufgabenliste aktualisieren
-            tasks = tasks.filter(task => task !== selectedTask);
-            counterDisplay.textContent = tasks.length;
         }
 
         // Verfügbare Aufgaben aus Firebase abrufen
         database.ref("generatedTasks").on("value", (snapshot) => {
-            const generatedTasks = snapshot.val() || {};
-            tasks = originalTasks.filter(task => !generatedTasks[task]);
-            counterDisplay.textContent = tasks.length;
+            try {
+                const generatedTasks = snapshot.val() || {};
+                tasks = originalTasks.filter(task => !generatedTasks[task]);
+                counterDisplay.textContent = tasks.length;
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Aufgaben:", error);
+            }
         });
     </script>
 </body>
