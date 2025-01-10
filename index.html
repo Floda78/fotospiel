@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fotospiel</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='50'>📸</text></svg>">
-    <meta name="description" content="Ein lustiges Fotospiel mit zufälligen Aufgaben für deine Party!">
-    <meta name="author" content="Dein Name">
     <style>
         body {
             background-color: #274472;
@@ -78,7 +75,7 @@
             margin-top: 10px;
             font-style: italic;
         }
-        
+
         .animation {
             animation-duration: 3s;
         }
@@ -123,8 +120,8 @@
         <button class="generate-button" onclick="generateTask()">Aufgabe generieren</button>
         <div class="task-display" id="taskDisplay">&nbsp;</div>
         <div class="counter" id="counterDisplay">Noch <span id="tasksRemaining">102</span> Aufgaben übrig</div>
-    </div
-        
+    </div>
+
     <script>
         const tasks = [
             "Mache ein Porträtfoto vom Geburtstagskind",
@@ -231,8 +228,7 @@
             "Mache ein Foto von einer kreativen Art, wie jemand eine Serviette faltet.",
         ];
 
-        // Aufgabe generieren
-        async function generateTask() {
+        function generateTask() {
             if (tasks.length === 0) {
                 document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
                 return;
@@ -258,6 +254,7 @@
                 document.getElementById("tasksRemaining").innerText = tasks.length;
                 button.disabled = false;
             }, 3000);
-   
+        }
+    </script>
 </body>
 </html>
