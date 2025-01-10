@@ -79,6 +79,10 @@
             animation: fadeIn 3s forwards;
         }
 
+        .swing {
+            animation: fadeIn 3s forwards;
+        }
+        
         .zoom {
             animation: zoomIn 3s forwards;
         }
@@ -96,6 +100,15 @@
             }
         }
 
+         @keyframes swing {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
         @keyframes zoomIn {
             from {
                 transform: scale(0);
@@ -132,7 +145,7 @@
         <p>Hab Spaß und frag vorher, wenn du jemanden fotografieren möchtest!</p>
         <button class="generate-button" onclick="generateTask()">Aufgabe generieren</button>
         <div class="task-display" id="taskDisplay">&nbsp;</div>
-        <div class="counter" id="counterDisplay">Noch <span id="tasksRemaining">102</span> Aufgaben übrig</div>
+        <div class="counter" id="counterDisplay">Noch <span id="tasksRemaining">101</span> Aufgaben übrig</div>
     </div>
 
     <script>
@@ -262,7 +275,7 @@
             const button = document.querySelector('.generate-button');
             button.disabled = true;
 
-            const animations = ["fade", "zoom", "rotate"];
+            const animations = ["fade", "zoom", "swing", "rotate"];
             const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
 
             const taskDisplayElement = document.getElementById("taskDisplay");
