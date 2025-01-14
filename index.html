@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fotospiel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='50'>📸</text></svg>">
+    <meta name="description" content="Ein lustiges Fotospiel mit zufälligen Aufgaben für deine Party!">
+    <meta name="author" content="Dein Name">
+    <style>
+        body {
+            background-color: #274472;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            background-color: #3C6E99;
+            border-radius: 10px;
+            padding: 20px 30px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        a {
+            color: #1E90FF;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .generate-button {
+            background-color: #38B000;
+            color: white;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .generate-button:hover {
+            transform: scale(1.05);
+        }
+
+        .task-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 20px;
+            opacity: 1;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .fade {
+            animation: fadeIn 3s forwards;
+        }
+
+        .swing {
+            animation: fadeIn 3s forwards;
+        }
+        
+        .zoom {
+            animation: zoomIn 3s forwards;
+        }
+
+        .rotate {
+            animation: rotateIn 3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+         @keyframes swing {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes zoomIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes rotateIn {
+            from {
+                transform: rotate(-360deg);
+            }
+            to {
+                transform: rotate(0);
+            }
+        }
+
+        .counter {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Willkommen beim Fotospiel!</h1>
+        <p>Drücke bitte nur einmal auf den Button, um eine zufällige Aufgabe zu erhalten. Darauf steht eine Fotoaufgabe, z. B.:</p>
+        <p><em>„Ein Gegenstand, der wie eine Zahl aussieht.“</em></p>
+        <p>Du hast den ganzen Abend Zeit, dein Foto zu machen – kreativ und lustig! Lade dein Foto anschließend hier hoch:</p>
+        <p><a href="https://fotospiel.onepage.me/" target="_blank">Upload Foto</a></p>
+        <p>Am Ende entscheidet die Jury (ihr), welches Foto gewonnen hat, und der Gewinner bekommt natürlich einen kleinen Preis.</p>
+        <p>Hab Spaß und frag vorher, wenn du jemanden fotografieren möchtest!</p>
+        <button class="generate-button" onclick="generateTask()">Aufgabe generieren</button>
+        <div class="task-display" id="taskDisplay">&nbsp;</div>
+        <div class="counter" id="counterDisplay">Noch <span id="tasksRemaining">101</span> Aufgaben übrig</div>
+    </div>
+
+    <script>
+        const originalTasks = [
+            "Mache ein Porträtfoto vom Geburtstagskind",
+            "Male das Geburtstagskind auf die Serviette und fotografiere die Zeichnung.",
+            "Fotografiere das Geburtstagskind von möglichst weit oben",
+            "Fotografiere das Outfit des Geburtstagskinds",
+            "Bringe das Geburtstagskind zum Lachen und fotografiere es",
+            "Mache dem Geburtstagskind ein Kompliment und fotografiere seine Reaktion",
+            "Schneide zusammen mit dem Geburtstagskind eine Grimasse und fotografiert euch dabei.",
+            "Stoße mit dem Geburtstagskind an und lass es fotografieren.",
+            "Mach eine Nahaufnahme von den Augen vom Geburtstagskind",
+            "Suche zwei Gäste aus und bitte sie dem Geburtstagskind rechts und links auf die Wange gleichzeitig ein Küsschen zu geben und fotografiere es.",
+            "Fotografiere das Geburtstagskind auf der Froschperspektive nach oben.",
+            "Mache eine schöne Aufnahme über die Schulter des Geburtstagskinds mit der Feier im Hintergrund.",
+            "Mache ein Foto vom schönsten Paar",
+            "Suche 5 unterschiedlich große Gäste und sortiere sie der Größe nach und mache ein Foto davon.",
+            "Bitte einen weiblichen Gast und einen männlichen Gast mit ihren Händen ein Herz zu formen und fotografiere es.",
+            "Suche deinen Lieblingsmenschen und mache ein schönes Selfie.",
+            "Mache ein Selfie von dir mit den jüngsten drei Gästen unter dem Tisch.",
+            "Mache ein einziges Foto von allen Familienmitgliedern des Geburtstagskindes.",
+            "Trommel mindestens 10 Gäste zusammen und fotografiere sie beim Anstoßen.",
+            "Lege die Kamera unten in die Mitte, beuge dich mit mindestens 3 anderen Gästen nach vorne, schaut nach unten und lacht",
+            "Mache ein Bild mit mindestens 5 Gästen, die eine Brille tragen und schaut alle sehr intelligent.",
+            "Bitte einen Gast durch die Kamera zu schauen und fotografiere ihn wie er dich fotografiert.",
+            "Suche den Gast mit dem schönsten Kleidungsstück und fotografiere ihn oder sie",
+            "Fotografiere ein Gast, das dir eine Kusshand zuwirft.",
+            "Mache ein Generationen-Foto",
+            "Fotografiere die schönste Frisur",
+            "Mache ein Foto von allen Geschwistern des Geburtstagskinds",
+            "Fotografiere den am besten gekleideten Mann.",
+            "Mach ein Selfie Foto von allen Leuten, die mit dir am Tisch sitzen.",
+            "Lasse einen Gast oder deine:n Partner:in mit den Händen ein Herz formen, durch das du das Geburtstagskind eingerahmt fotografierst.",
+            "Bitte einen Gast dir möglichst durchtrieben zuzublinzeln und fotografiere ihn dabei.",
+            "Fotografiere die schönste Frisur",
+            "Bitte einen Gast die Pose von Angela Merkel einzunehmen und sie nachzuahmen und fotografiert das",
+            "Mache ein Selfie mit dem Essen, das ausdrückt wie lecker du ihn findest.",
+            "Mache ein Foto von dem Mann mit dem längsten Bart.",
+            "Fotografiere einen Gast, der ein Gesicht macht, als würde er gerade im Looping in der Achterbahn fahren.",
+            "Bitte einen Gast das Geburtstagskind zu porträtieren und mache ein Foto davon.",
+            "Bitte den größten Gast, den kleinsten Gast auf die Schultern zu nehmen und fotografiere sie.",
+            "Versuche ein Foto mit so vielen Gästen wie möglich zu machen.",
+            "Fotografiere die Hand des ältesten Hochzeitsgasts",
+            "Finde eine Person, die genauso groß ist wie du und mache mit ihr zusammen ein Foto Rücken an Rücken.",
+            "Trommel alle Frauen zusammen und mache ein Gruppenbild von allen",
+            "Mache ein Bild mit allen Schülern",
+            "Mache ein Foto von allen Mannschaftskollegen des Geburtstagskinds.",
+            "Trommel alle Männer zusammen und mache ein Gruppenbild von allen",
+            "Finde 3 Gäste, die zusammen genau 100 Jahre sind.",
+            "Finde einen Gast mit einem witzigen Personalausweis-Foto und fotografiere es (nur das Bild) und den Besitzer",
+            "Finde den Gast mit der weitesten Anreise und fotografiere ihn aus der Entfernung.",
+            "Mache ein Foto mit allen, die mit dem Geburtstagskind in einer Klasse waren.",
+            "Finde eine Person mit dem gleichen Sternzeichen und mache ein Foto von euch",
+            "Finde den jüngsten und den ältesten Gast und fotografiere sie zusammen!",
+            "Finde die Person, die deinem Alter am nächsten ist und fotografiert euch zusammen!",
+            "Mache ein Foto mit der Person, die die meisten Kinder hat.",
+            "Finde einen Gast mit einem witzigen Führerscheinfoto und mache ein Bild vom Führerschein-Foto und Besitzer.",
+            "Finde eine Person, deren Vorname mit dem gleichen Buchstaben beginnt wie deiner und macht zusammen ein Selfie",
+            "Mache ein Foto mit allen, die ein Haustier haben.",
+            "Mache ein Foto mit allen, die ein Instrument spielen.",
+            "Finde eine Person mit einer Gemeinsamkeit und fotografiert euch zusammen!",
+            "Finde eine Person, die etwas total ungewöhnliches macht und macht gemeinsam ein Foto.",
+            "Finde heraus, welches Paar am längsten zusammen/verheiratet ist und fotografiere es!",
+            "Suche alle Gäste mit der gleichen Schuhfarbe wie deine und mache ein Bild von euren Schuhen.",
+            "Fotografiere das schönste Stück der Deko",
+            "Mach ein Bild von der Geburtstagsgesellschaft in Vogelperspektive – mindestens von einem Stuhl!",
+            "Fotografiere etwas total typisches für den Ort der Geburtstagsfeier drinnen oder draußen.",
+            "Mache ein Foto vom gefüllten Snacktisch.",
+            "Mache ein Vorher-Bild von der Tanzfläche",
+            "Mache ein Selfie vom Eingang der Location",
+            "Mache ein Foto von dir und der Location",
+            "Trommel mindestens 4 Geburtstagsgäste zusammen und lasse sie die Initialien des Geburtstagskindes darstellen und fotografiere es.",
+            "Finde jemanden, der einen Handstand oder ein Rad macht und fotografiere sie dabei",
+            "Fotografiere dich, wie du eine Yoga-Pose machst",
+            "Finde so viele Männer, wie du kannst die einen anderen Gast auf den Arm nehmen und fotografiere die Gruppe.",
+            "Rufe zur Polonaise auf, die du anführst und mache ein Selfie.",
+            "Trommle 3 Männer zusammen, die das Geburtstagskind über ihre Schultern hoch in die Luft heben und schweben lassen",
+            "Wünsche dir ein Lied und motiviere 3 Leute mit dir dazu richtig abzugehen und zusammen ein Selfie zu machen",
+            "Fotografiere den wildesten Tänzer",
+            "Finde jemanden, der dich Huckepack nimmt oder nimm jemanden Huckepack und mache ein Foto davon.",
+            "Suche einen männlichen Gast, der (deine) Absatzschuhe anzieht und in ihnen einen Catwalk hinlegt",
+            "Bringe jemanden dazu, dem Geburtstagskind ein Ständchen zu singen und fotografiere es.",
+            "Knipse dich kurz bevor du mit dem Geburtstags-Essen futtern anfängst vor dem Teller und schau so verfressen wie du kannst.",
+            "Stelle mit anderen Gästen die Evolution des Affen bis zum Menschen dar und lasst euch dabei fotografieren.",
+            "Halte das Glas vor das Gesicht eines Gasts, so dass es ganz verzerrt ist und mache durch den Glasboden ein Foto davon.",
+            "Du hast im Lotto gewonnen – zeig deinen besten Jubel!",
+            "Finde eine Person, die du nicht kennst und fotografiert euch gemeinsam beim schneiden der gleichen Grimasse.",
+            "Mach eine Nahaufnahme von einem köstlichen Bissen Nachtisch, kurz bevor er im Mund eines Gastes verschwindet.",
+            "Mach ein Foto von dir mit der Tischdeko als Kopfbedeckung.",
+            "Stelle alleine oder mit anderen Gästen eine Szene aus einem Film nach und lasst euch fotografieren",
+            "Suche möglichst viele Gäste, die ihre Zunge gleichzeitig für ein Foto herausstrecken.",
+            "Suche einen Gast mit witzigen Socken und mache ein Bild von den Socken.",
+            "Mache einen Karatekick und fotografiere es.",
+            "Nimm dir ein Requisit von der Deko und mach damit ein albernes Bild.",
+            "Stelle mit 3 weiteren Gästen die 4 Elemente pantomimisch dar und lasst euch fotografieren",
+            "Bringe mehrere Gäste dazu gleichzeitig hochzuspringen und fotografiere den Moment",
+            "Mach ein Bild von 7 Gästen, die ihre Hände im Schoß verschränken wie bei der Mauer beim Fußball und fotografiere sie ohne Köpfe.",
+            "Mach ein Bild von 7 Gästen, die ihre Hände im Schoß verschränken wie bei der Mauer beim Fußball und fotografiere nur die Köpfe.",
+            "Fordere einen Gast heraus, eine schwierige körperliche Herausforderung zu meistern, z. B. einen „Kopfstand“ oder „eine perfekte Plank-Position“ für mindestens 10 Sekunden zu halten und fotografiere dies",
+            "Fordere jemanden zu einem Rennen heraus und mache ein Foto von der Startlinie.",
+            "Mache ein Foto von dir und einem Gast in der Luft, während ihr beide einen High-Five macht.",
+            "Bitte jemanden, einen Handstand zu machen, und fotografiere den Moment.",
+            "Mache ein Foto von dir und dem Geburtstagskind, während ihr beide in eine Pose springt.",
+            "Fordere jemanden zu einem Tanz-Wettbewerb heraus und mache ein Bild davon.",
+            "Mache ein Foto von einer kreativen Art, wie jemand eine Serviette faltet.",
+        ];
+
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [...originalTasks];
+
+        const lastResetTime = localStorage.getItem("lastResetTime");
+        const currentTime = new Date().getTime();
+        const twelveHoursInMilliseconds = 12 * 60 * 60 * 1000;
+
+        if (!lastResetTime || currentTime - lastResetTime >= twelveHoursInMilliseconds) {
+            tasks = [...originalTasks];
+            localStorage.setItem("lastResetTime", currentTime);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
+        function generateTask() {
+            if (tasks.length === 0) {
+                document.getElementById("taskDisplay").innerText = "Alle Aufgaben wurden bereits verteilt!";
+                return;
+            }
+
+            const button = document.querySelector('.generate-button');
+            button.disabled = true;
+
+            const animations = ["fade", "zoom", "swing", "rotate"];
+            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+
+            const taskDisplayElement = document.getElementById("taskDisplay");
+            taskDisplayElement.className = "task-display " + randomAnimation;
+
+            const animationsText = ["Wird geladen...", "Zufällige Aufgabe wird gesucht...", "Gleich hast du deine Aufgabe..."];
+            let i = 0;
+            const interval = setInterval(() => {
+                taskDisplayElement.innerText = animationsText[i % animationsText.length];
+                i++;
+            }, 500);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                const randomIndex = Math.floor(Math.random() * tasks.length);
+                const selectedTask = tasks.splice(randomIndex, 1)[0];
+                taskDisplayElement.innerText = selectedTask;
+                document.getElementById("tasksRemaining").innerText = tasks.length;
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+                button.disabled = false;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
